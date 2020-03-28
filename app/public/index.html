@@ -111,13 +111,25 @@
                 </aside>
             </div>
             <div class="column is-three-quarters">
-                <!-- the map view should go here-->
-                <div class="box"></div>
                 <!-- <img src="https://media.giphy.com/media/3o6Zt7aSSZLX6U5WtW/source.gif">  -->
-            </div>
+                <h1>Real Time Location</h1>
+
+                <div id="googleMap" style="width:100%; height: 100%"></div>
+
+                <script>
+                    function myMap() {
+						const mapProp = {
+							center: new google.maps.LatLng(49.282730, -123.120735),
+							zoom: 10,
+						};
+						const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+                  	}
+				</script>
+			</div>
         </div>
 
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf0P8iZZuSidtqI8NgEkPwwxTs1spB858&callback=myMap"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-        <script src="./js/index.js"></script>
+		<script src="./js/index.js"></script>
     </body>
 </html>
