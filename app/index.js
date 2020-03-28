@@ -22,7 +22,13 @@ const pusher = new Pusher({
 });
 
 pusher.trigger("my-channel", "my-event", {
-    message: "hello world"
+    location: "Intersection at Granville St &  W Broadway",
+    img: undefined,
+    incidentType: "Vehicle Collision",
+    victims: "Vehicle - Vehicle",
+    severity: 5,
+    isResponderDispatched: "Yes",
+    time: new Date().toString(),
 });
 
 // router.get("/get_stuff", (req, res) => {

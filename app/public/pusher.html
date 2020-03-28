@@ -5,12 +5,12 @@
         // Enable pusher logging - don't include this in production
         Pusher.logToConsole = true;
 
-        var pusher = new Pusher("2be0eb411175134a82ca", {
+        const pusher = new Pusher("2be0eb411175134a82ca", {
             cluster: "us3",
             forceTLS: true
         });
 
-        var channel = pusher.subscribe("my-channel");
+        const channel = pusher.subscribe("my-channel");
         channel.bind("my-event", function(data) {
             alert(JSON.stringify(data));
         });
