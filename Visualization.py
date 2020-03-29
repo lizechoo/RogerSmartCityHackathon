@@ -19,9 +19,10 @@ import struct
 import time
 #from copy import deepcopy
 #from time import gmtime, strftime
-import pandas as pd 
+import pandas as pd
 import cv2
 import collision
+import itertools
 
 
 
@@ -268,10 +269,11 @@ if __name__ == "__main__":
 
     ''' Collisions Dictionary to store all objects '''
     road_object = {}
+    collision_pairs = [[]]
 
     PEDS_RADIUS = 10      # radius for the pedestrians
     CYCL_SIZE = 20       # size of the cyclists
-    CAR_SIZE = 15        # size of the cars
+    CAR_SIZE = 20        # size of the cars
     
     
     pcapSniffer = PcapSniffer('./'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer
@@ -336,15 +338,15 @@ if __name__ == "__main__":
                 Oid=P_sub[i,1]
 
                 if(mode == 2):  # Pedestrians
-                    road_object[Oid] = collision.Circle(collision.Vector(cx, cy), PEDS_RADIUS)
+                    road_object[Oid] = [mode, collision.Circle(collision.Vector(cx, cy), PEDS_RADIUS)]
                     cv2.circle(frame, (cx, cy), PEDS_RADIUS, (255, 0, 0), 2)
 
                 if(mode == 1):  # Cars
-                    road_object[Oid] = collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE, CAR_SIZE)
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE, CAR_SIZE)]
                     cv2.rectangle(frame, (cx - CAR_SIZE, cy - CAR_SIZE), (cx + CAR_SIZE, cy + CAR_SIZE), (0, 0, 255), 2)
 
                 if(mode == 3):  # Cyclists
-                    road_object[Oid] = collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE, CYCL_SIZE)
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE, CYCL_SIZE)]
                     cv2.rectangle(frame, (cx - CYCL_SIZE, cy - CYCL_SIZE), (cx + CYCL_SIZE, cy + CYCL_SIZE), (0, 0, 255), 2)
                 
                 if(plot_object):
@@ -392,11 +394,42 @@ if __name__ == "__main__":
                     cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
                     cv2.putText(frame,str(int(l)),(int(cx),int(cy)),font, 0.6, (255,255,255),2)
 
-            for key1 in road_object:
-                for key2 in road_object:
-                    if(key1 != key2):
-                        if(collision.collide(road_object[key1], road_object[key2])):
-                            cv2.putText(frame, 'Warning Collision Detected!', (road_object[key1].pos.x, road_object[key2].pos.y), font, 0.6, (0,0,255),2)
+            # for key1 in road_object:
+            #     for key2 in road_object:
+            #         if(key1 != key2):
+            #             if((not (road_object[key1][0] == 2 and road_object[key2][0] == 2)) and collision.collide(road_object[key1][1], road_object[key2][1])):
+            #                 cv2.putText(frame, 'Warning Collision Detected!', (road_object[key1][1].pos.x, road_object[key2][1].pos.y), font, 0.6, (0, 0, 255), 2)
+
+
+            # for key1 in road_object:
+            #     for key2 in road_object:
+            #         # Collisions happens in these conditions:
+            #         #   1. Two objects are not the same object
+            #         #   2. Both objects are not pedestrians
+            #         #   3. Both objects collides
+            #         if(key1 != key2 and (not (road_object[key1][0] == 2 and road_object[key2][0] == 2)) and collision.collide(road_object[key1][1], road_object[key2][1])):
+            #             # Now we need to check whether if the collisions are already registered in the array
+            #             if(not any(key1 in p for p in collision_pairs) and not any(key2 in p for p in collision_pairs)):  # If both keys are not in collision pairs
+            #                 collision_pairs.append([key1, key2]) # Add new pairs
+
+            object_list = road_object.values()
+            objects_combinations = list(itertools.combinations(object_list, 2))
+
+            for i in objects_combinations:
+                if((not (i[0][0] == 2 and i[1][0] == 2)) and collision.collide(i[0][1], i[1][1])):
+                    cv2.putText(frame, 'Warning Collision Detected!', (i[0][1].pos.x, i[1][1].pos.y), font, 0.6, (0, 0, 255), 2)
+
+
+            # for key1 in road_object:
+            #     for key2 in road_object:
+            #         if(key1 != key2 and collision.collide(road_object[key1], road_object[key2])):
+            #             if(key1 not in collision_pair):
+            #                 pair = [road_object[key1], road_object[key2]]
+            #                 collision_pair.append(pair)
+
+
+
+
                 
             cv2.putText(frame,'Mode : '+toggle_mode[toggle_mode_index-1],(750,50),font, 0.6, (0,0,255),2)
             cv2.putText(frame,str(frame_count_total),(750,20),font, 0.6, (0,0,255),2)
