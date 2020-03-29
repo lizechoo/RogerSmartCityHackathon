@@ -13,19 +13,26 @@ const pusher = new Pusher({
 });
 
 router.post("/dispatch", (req, res) => {
-    console.log("/dispatch endpoint called");
+    // console.log("/dispatch endpoint called", req.body, "body end");
+    // console.log("req headers", req.headers);
     
+    const severity = (req.body.numVictims[0]*1) + (req.body.numVictims[1]*3) + (req.body.numVictims[2]*2);
+    const severityThreshold = 5;
+
     pusher.trigger("my-channel", "my-event", {
-        location: "Intersection at Granville St &  W Broadway",
+        location: req.body.address,
+        lat: req.body.lat,
+        lng: req.body.lng,
         img: undefined,
-        incidentType: "Vehicle Collision",
-        victims: "Vehicle - Vehicle",
-        severity: 5,
-        isResponderDispatched: "Yes",
+        incidentType: "Collision",
+        victims: req.body.victimTypesInvolved.join(" - "),
+        severity: severity,
+        isResponderDispatched: (severity >= severityThreshold) ? "Yes" : "No",
         time: new Date().toString(),
     });
+
     res.json({
-        "message": "Dispatch successfully sent",
+        "message": (severity >= severityThreshold) ? "Dispatch successfully sent" : "Dispatch not required",
     });
 });
 
