@@ -3,6 +3,8 @@ $(document).ready(function() {
      // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
 
+    let evtCount = 0;
+
     const pusher = new Pusher("2be0eb411175134a82ca", {
         cluster: "us3",
         forceTLS: true
@@ -11,26 +13,28 @@ $(document).ready(function() {
     const channel = pusher.subscribe("my-channel");
     channel.bind("my-event", function(data) {
         // alert(JSON.stringify(data));
-        
+        const evtId = Date.now();
+
         // Triggers custom event and map view has event listener that will display marker
         const evt = new CustomEvent("dispatch_event", {
             detail: {
                 lat: data.lat,
                 lng: data.lng,
+                id: evtId,
             },
             bubbles: true,
             cancelable: false,
         });
         document.getElementById("googleMap").dispatchEvent(evt);
-
+        console.log("here");
         // Render a card displaying dispatch details
-        $("#dispatches-list").append(
-            `<li>
+        $("#incidents-list").append(
+            `<li id=${evtId}>
                 <div class="card" style="margin-bottom: 10px;">
                     <header class="card-header">
-                        <p class="card-header-title">
+                        <a class="card-header-title" onclick="toggleBounce(${evtId})">
                             ${data.location || "Unspecified"}
-                        </p>
+                        </a>
                     </header>
                     <div class="card-image">
                         <figure class="image is-4by3">
