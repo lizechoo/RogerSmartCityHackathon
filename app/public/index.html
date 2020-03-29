@@ -13,12 +13,11 @@
             src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
         ></script>
     </head>
-    <body>
-        <nav class="navbar has-background-grey-dark" role="navigation" aria-label="main navigation">
+    <body style="overflow: hidden;">
+        <nav class="navbar has-background-black-ter" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
-                <a class="navbar-item has-text-white" href="#" width="112" height="28">
-                    <!-- <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: Free, open source, and modern CSS framework based on Flexbox" width="112" height="28"> -->
-                    Smart City
+                <a class="navbar-item has-text-white" href="#">
+                    <img src="./img/logo_rectangle.png" alt="Hermes+" style="">
                 </a>
 
                 <a
@@ -34,7 +33,7 @@
             </div>
         </nav>
 
-        <div class="columns" style="margin-top: 0px;">
+        <div class="columns has-background-grey-darker" style="margin-top: 0px;">
             <div class="column is-one-quarter" style="height: 950px; overflow-y: scroll">
                 <aside class="menu" style="margin-left: 1rem">
                     <h1 class="menu-label" style="font-size: 1.15em">
@@ -46,9 +45,9 @@
                         <li>
                             <div class="card" style="margin-bottom: 10px;">
                                 <header class="card-header">
-                                    <p class="card-header-title">
+                                    <a class="card-header-title" onclick="toggleBounce('yay')">
                                         Intersection at Granville St &  W Broadway
-                                    </p>
+									</a>
 								</header>
 								<div class="card-image">
 									<figure class="image is-4by3">
@@ -117,7 +116,19 @@
                 <div id="googleMap" style="width:100%; height: 100%"></div>
 
                 <script>
-                    
+
+					let marker;
+					let alertMarkerMapping = {};
+
+					function toggleBounce(id) {
+						const m = alertMarkerMapping[id];
+						if (m.getAnimation() !== null) {
+							m.setAnimation(null);
+						} else {
+							m.setAnimation(google.maps.Animation.BOUNCE);
+						}
+					}
+
                     function myMap() {
 						const mapProp = {
 							center: new google.maps.LatLng(49.882114, -119.477829),
@@ -148,32 +159,31 @@
 							animation: google.maps.Animation.DROP,
 						});
 
-						new google.maps.Marker({
+						const hospital = new google.maps.Marker({
 							position: { lat: 49.893941, lng: -119.489617 },
 							icon: policeIcon,
 							map: map,
 							animation: google.maps.Animation.DROP,
-                        });
+							id: "testId",
+						});
+
+						const asdf = new google.maps.Marker({
+							position: { lat: 49.8880, lng: -119.4960 },
+							map: map,
+							animation: google.maps.Animation.DROP,
+						});
+						alertMarkerMapping["yay"] = asdf;
+
 
 						document.addEventListener("dispatch_event", (evt) => {
 							const marker = new google.maps.Marker({
 								position: { lat: evt.detail.lat, lng: evt.detail.lng },
 								map: map,
-								title: 'Hello World!',
 								animation: google.maps.Animation.DROP,
-                            });
-                            marker.addListener("click", toggleBounce);
-                        }, false);
-
-                      }
-
-                    function toggleBounce() {
-                            if (marker.getAnimation() !== null) {
-                                marker.setAnimation(null);
-                            } else {
-                                marker.setAnimation(google.maps.Animation.BOUNCE);
-                            }
-                        }
+							});
+							alertMarkerMapping[evt.detail.id] = marker;
+						}, false);
+                  	}
 				</script>
 			</div>
         </div>
