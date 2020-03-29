@@ -342,11 +342,11 @@ if __name__ == "__main__":
                     cv2.circle(frame, (cx, cy), PEDS_RADIUS, (255, 0, 0), 2)
 
                 if(mode == 1):  # Cars
-                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE, CAR_SIZE)]
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE * 2, CAR_SIZE * 2)]
                     cv2.rectangle(frame, (cx - CAR_SIZE, cy - CAR_SIZE), (cx + CAR_SIZE, cy + CAR_SIZE), (0, 0, 255), 2)
 
                 if(mode == 3):  # Cyclists
-                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE, CYCL_SIZE)]
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE * 2, CYCL_SIZE * 2)]
                     cv2.rectangle(frame, (cx - CYCL_SIZE, cy - CYCL_SIZE), (cx + CYCL_SIZE, cy + CYCL_SIZE), (0, 0, 255), 2)
                 
                 if(plot_object):
@@ -418,6 +418,7 @@ if __name__ == "__main__":
             for i in objects_combinations:
                 if((not (i[0][0] == 2 and i[1][0] == 2)) and collision.collide(i[0][1], i[1][1])):
                     cv2.putText(frame, 'Warning Collision Detected!', (i[0][1].pos.x, i[1][1].pos.y), font, 0.6, (0, 0, 255), 2)
+                    print('Collision Detected!')
 
 
             # for key1 in road_object:
