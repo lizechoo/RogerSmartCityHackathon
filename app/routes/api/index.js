@@ -20,6 +20,7 @@ router.post("/dispatch", (req, res) => {
         "https://shawglobalnews.files.wordpress.com/2019/08/victoria-crash-e1566683791564.jpg?quality=70&strip=all",
         "https://cdn.cnn.com/cnnnext/dam/assets/151130053712-cars-china-traffic-levitate-vo-00001016-exlarge-169.jpg",
         "https://secure.i.telegraph.co.uk/multimedia/archive/03350/Motorycycle-crash-_3350623b.jpg",
+        "https://s.abcnews.com/images/US/170517_vod_orig_bus_crash_16x9_992.jpg",
     ];
     
     const severity = (req.body.numVictims[0]*1) + (req.body.numVictims[1]*3) + (req.body.numVictims[2]*2);
@@ -29,7 +30,7 @@ router.post("/dispatch", (req, res) => {
         location: req.body.address,
         lat: parseFloat(req.body.lat),
         lng: parseFloat(req.body.lng),
-        img: imgs[Math.floor((Math.random() * 3))] || undefined,
+        img: imgs[Math.floor((Math.random() * 4))] || undefined,
         incidentType: "Collision",
         victims: req.body.victimTypesInvolved.join(" - "),
         severity: severity,
