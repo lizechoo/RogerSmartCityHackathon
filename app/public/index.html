@@ -118,7 +118,7 @@
 
                 <script>
 
-                    var myMarker;
+                    var iconOne;
 
                     function myMap() {
 						const mapProp = {
@@ -143,7 +143,7 @@
 							new google.maps.Size(30, 40)
 						);
 
-						new google.maps.Marker({
+						IconOne = new google.maps.Marker({
 							position: { lat: 49.8736, lng: -119.4939 },
 							icon: hospitalIcon,
 							map: map,
@@ -157,7 +157,7 @@
 							animation: google.maps.Animation.DROP,
                         });
 
-                        myMarker.addListener("click", toggleBounce);
+                        IconOne.addListener("click", toggleBounce);
 
 						document.addEventListener("dispatch_event", (evt) => {
 							const marker = new google.maps.Marker({
@@ -174,10 +174,10 @@
 
 
                     function toggleBounce() {
-                            if (myMarker.getAnimation() !== null) {
-                                myMarker.setAnimation(null);
+                            if (IconOne.getAnimation() !== null) {
+                                IconOne.setAnimation(null);
                             } else {
-                                myMarker.setAnimation(google.maps.Animation.BOUNCE);
+                                IconOne.setAnimation(google.maps.Animation.BOUNCE);
                             }
                         }
 				</script>
