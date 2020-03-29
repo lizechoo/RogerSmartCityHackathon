@@ -10,7 +10,21 @@ $(document).ready(function() {
 
     const channel = pusher.subscribe("my-channel");
     channel.bind("my-event", function(data) {
-        alert(JSON.stringify(data));
+        // alert(JSON.stringify(data));
+        
+        // Triggers custom event and map view has event listener that will display marker
+        const evt = new CustomEvent("dispatch_event", {
+            detail: {
+                // TODO: these values need to from `data`  once the data contract has been decided
+                lat: 49.882114,
+                lng: -119.477829,
+            },
+            bubbles: true,
+            cancelable: false,
+        });
+        document.getElementById("googleMap").dispatchEvent(evt);
+
+        // Render a card displaying dispatch details
         $("#dispatches-list").append(
             `<li>
                 <div class="card" style="margin-bottom: 10px;">
@@ -53,12 +67,5 @@ $(document).ready(function() {
             </li>`
         );
     });
-
-    console.log("test");
-    // $("#dispatches-list").append(
-    //     $("li").append(
-    //         $("p").html("test")
-    //     )
-    // );
 
 });

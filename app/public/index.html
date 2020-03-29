@@ -52,7 +52,7 @@
 								</header>
 								<div class="card-image">
 									<figure class="image is-4by3">
-									  <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+									  <img src="https://cdn.cnn.com/cnnnext/dam/assets/151130053712-cars-china-traffic-levitate-vo-00001016-exlarge-169.jpg" alt="Placeholder image">
 									</figure>
 								  </div>
                                 <div class="card-content">
@@ -119,10 +119,19 @@
                 <script>
                     function myMap() {
 						const mapProp = {
-							center: new google.maps.LatLng(49.282730, -123.120735),
-							zoom: 10,
+							center: new google.maps.LatLng(49.882114, -119.477829),
+							zoom: 13,
 						};
 						const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+						document.addEventListener("dispatch_event", (evt) => {
+							const marker = new google.maps.Marker({
+								position: { lat: evt.detail.lat, lng: evt.detail.lng },
+								map: map,
+								title: 'Hello World!',
+								animation: google.maps.Animation.DROP,
+							});
+						}, false);
                   	}
 				</script>
 			</div>
