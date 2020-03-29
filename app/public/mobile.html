@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html  class="has-background-grey-darker" style="min-height: 100%;">
+    <head>
+        <title>Hermes+ - Sending Saviours with Speed</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.1/css/bulma.css"
+		/>
+
+		<script src="https://js.pusher.com/5.1/pusher.min.js"></script>
+        <script
+            defer
+            src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
+        ></script>
+    </head>
+    <body>
+        <nav class="navbar has-background-black" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand" style="justify-content: center;">
+                <a class="navbar-item has-text-white" href="#">
+                    <img src="./img/hermes.png" alt="Hermes+" style="justify-content: center; margin: 0 auto;">
+                </a>
+
+                <!-- <a
+                    role="button"
+                    class="navbar-burger"
+                    aria-label="menu"
+                    aria-expanded="false"
+                >
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a> -->
+            </div>
+        </nav>
+
+        <div class="container">
+            <h1 class="menu-label" style="margin-left: 1rem; font-size: 1.15em; font-weight: bold;">
+                Incidents
+            </h1>
+            <ul id="incidents-list" class="menu-list">
+                <li>
+                    <div class="card" style="margin: 20px; border-radius: 10px">
+                        <header class="card-header">
+                            <a class="card-header-title" style="border-radius: 10px">
+                                Intersection at Granville St &  W Broadway
+                            </a>
+                        </header>
+                        <div class="card-image">
+                            <figure class="image is-3by2">
+                                <img src="https://cdn.cnn.com/cnnnext/dam/assets/151130053712-cars-china-traffic-levitate-vo-00001016-exlarge-169.jpg" alt="Placeholder image">
+                            </figure>
+                            </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <ul style="list-style-type: none;">
+                                    <li>
+                                        <b>Incident Type: </b> Vehicle Collision
+                                    </li>
+                                    <li>
+                                        <b>Victims: </b> Vehicle - Vehicle
+                                    </li>
+                                    <li>
+                                        <b>Severity: </b> 5
+                                    </li>
+                                    <li>
+                                        <b>Responder en route: </b> Yes
+                                    </li>
+                                </ul>
+                                <br />
+                                <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                            </div>
+                        </div>
+                        <footer class="card-footer" style="text-align: center">
+                            <a href="#" class="card-footer-item" style="border-radius: 10px">Accept</a>
+                            <a href="#" class="card-footer-item" style="border-radius: 10px">Decline</a>
+                        </footer>
+                    </div>
+                </li>
+            </ul>
+
+            <script>
+                // document.addEventListener("dispatch_event", (evt) => {
+                //     const marker = new google.maps.Marker({
+                //         position: { lat: evt.detail.lat, lng: evt.detail.lng },
+                //         map: map,
+                //         animation: google.maps.Animation.DROP,
+                //     });
+                //     alertMarkerMapping[evt.detail.id] = marker;
+                // }, false);
+            </script>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="./js//mobile.js"></script>
+    </body>
+</html>

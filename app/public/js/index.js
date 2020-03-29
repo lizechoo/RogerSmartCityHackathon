@@ -35,7 +35,7 @@ $(document).ready(function() {
                         </a>
                     </header>
                     <div class="card-image">
-                        <figure class="image is-4by3">
+                        <figure class="image is-3by2">
                             <img src=${data.img || "https://cdn.cnn.com/cnnnext/dam/assets/151130053712-cars-china-traffic-levitate-vo-00001016-exlarge-169.jpg"} alt="Placeholder image">
                         </figure>
                     </div>
