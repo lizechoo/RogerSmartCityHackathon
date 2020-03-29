@@ -24,6 +24,8 @@ import cv2
 import collision
 import itertools
 
+from Send_Alert import *
+
 
 
 ''' This block of code is mainly for reading raw packet of data received from a lidar sensor and convert it to arrays of distance measurements or frames, DO NOT edit it '''
@@ -253,7 +255,7 @@ if __name__ == "__main__":
     plot_tracking=True
     toggle_mode=['car','ped','bike','all']
     toggle_mode_index=4 # it starts with showing all modes
-    fps=30.0
+    fps=10.0
     
     ''' Exisitng file names '''
     file_name='DATA_20200323_154915'
@@ -269,11 +271,30 @@ if __name__ == "__main__":
 
     ''' Collisions Dictionary to store all objects '''
     road_object = {}
-    collision_pairs = [[]]
 
-    PEDS_RADIUS = 10      # radius for the pedestrians
-    CYCL_SIZE = 20       # size of the cyclists
+    ''' Incident Arrays to store all incidents to prevent from pushing same alerts'''
+    incident_arrays = []
+
+    PEDS_RADIUS = 8      # radius for the pedestrians
+    CYCL_SIZE = 10       # size of the cyclists
     CAR_SIZE = 20        # size of the cars
+
+    # List of addresses
+    #   1. Latitude
+    #   2. Longtitude
+    #   3. Address
+    address = [[49.886282, -119.476950, "Bernard Ave & Gordon Dr, Kelowna BC"],
+               [49.886325, -119.482776, "Ethel St & Bernard Ave, Kelowna BC"],
+               [49.885388, -119.488528, "Lawrence Ave & Richter St, Kelowna BC"],
+               [49.886321, -119.493538, "Bernard Ave & Ellis St, Kelowna BC"],
+               [49.887323, -119.496564, "Water St & Queensway, Kelowna BC"],
+               [49.893563, -119.488507, "Richter St & Clement Ave, Kelowna BC"],
+               [49.893563, -119.482746, "Clement Ave & Ethel St, Kelowna BC"],
+               [49.893646, -119.477103, "Clement Ave & Gordon Dr, Kelowna BC"],
+               [49.872774, -119.476033, "Guisachan Rd & Gordon Dr, Kelowna BC"],
+               [49.865406, -119.482784, "Raymer Ave & Ethel St, Kelowna BC"]]
+    address_size = len(address)
+    address_index = 0
     
     
     pcapSniffer = PcapSniffer('./'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer
@@ -394,41 +415,24 @@ if __name__ == "__main__":
                     cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
                     cv2.putText(frame,str(int(l)),(int(cx),int(cy)),font, 0.6, (255,255,255),2)
 
-            # for key1 in road_object:
-            #     for key2 in road_object:
-            #         if(key1 != key2):
-            #             if((not (road_object[key1][0] == 2 and road_object[key2][0] == 2)) and collision.collide(road_object[key1][1], road_object[key2][1])):
-            #                 cv2.putText(frame, 'Warning Collision Detected!', (road_object[key1][1].pos.x, road_object[key2][1].pos.y), font, 0.6, (0, 0, 255), 2)
-
-
-            # for key1 in road_object:
-            #     for key2 in road_object:
-            #         # Collisions happens in these conditions:
-            #         #   1. Two objects are not the same object
-            #         #   2. Both objects are not pedestrians
-            #         #   3. Both objects collides
-            #         if(key1 != key2 and (not (road_object[key1][0] == 2 and road_object[key2][0] == 2)) and collision.collide(road_object[key1][1], road_object[key2][1])):
-            #             # Now we need to check whether if the collisions are already registered in the array
-            #             if(not any(key1 in p for p in collision_pairs) and not any(key2 in p for p in collision_pairs)):  # If both keys are not in collision pairs
-            #                 collision_pairs.append([key1, key2]) # Add new pairs
-
-            object_list = road_object.values()
+            object_list = road_object.keys()
             objects_combinations = list(itertools.combinations(object_list, 2))
 
             for i in objects_combinations:
-                if((not (i[0][0] == 2 and i[1][0] == 2)) and collision.collide(i[0][1], i[1][1])):
-                    cv2.putText(frame, 'Warning Collision Detected!', (i[0][1].pos.x, i[1][1].pos.y), font, 0.6, (0, 0, 255), 2)
-                    print('Collision Detected!')
-
-
-            # for key1 in road_object:
-            #     for key2 in road_object:
-            #         if(key1 != key2 and collision.collide(road_object[key1], road_object[key2])):
-            #             if(key1 not in collision_pair):
-            #                 pair = [road_object[key1], road_object[key2]]
-            #                 collision_pair.append(pair)
-
-
+                if((not (road_object[i[0]][0] == 2 and road_object[i[1]][0] == 2)) and collision.collide(road_object[i[0]][1] , road_object[i[1]][1])):
+                    # Check if collisions are already reported or not
+                    if(i[0] not in incident_arrays or i[1] not in incident_arrays):
+                        incident_arrays.append(i[0])
+                        incident_arrays.append(i[1])
+                        cv2.putText(frame, 'Warning Collision Detected!', (road_object[i[0]][1].pos.x, road_object[i[0]][1].pos.y), font, 0.6, (0, 0, 255), 2)
+                        print('Collision Detected!')
+                        print(frame_count_total)
+                        # Send alert to Web
+                        send_alert(address[address_index], road_object[i[0]][0], road_object[i[1]][0])
+                        address_index += 1
+                        if(address_index >= address_size):
+                            address_index = 0
+                        break
 
 
                 
