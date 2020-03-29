@@ -15,9 +15,8 @@ $(document).ready(function() {
         // Triggers custom event and map view has event listener that will display marker
         const evt = new CustomEvent("dispatch_event", {
             detail: {
-                // TODO: these values need to from `data`  once the data contract has been decided
-                lat: 49.882114,
-                lng: -119.477829,
+                lat: data.lat,
+                lng: data.lng,
             },
             bubbles: true,
             cancelable: false,
