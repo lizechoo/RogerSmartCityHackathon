@@ -1,0 +1,12 @@
+{
+    "victimTypesInvolved": [
+        "vehicle",
+        "human",
+        "cyclist"
+    ],
+    "numVictims": "number",
+    "location": {
+        "lat": "number",
+        "lng": "number"
+    }
+}

@@ -38,9 +38,9 @@
             <div class="column is-one-quarter" style="height: 950px; overflow-y: scroll">
                 <aside class="menu" style="margin-left: 1rem">
                     <p class="menu-label">
-                        Dispatches
+                        Incidents
                     </p>
-                    <ul id="dispatches-list" class="menu-list">
+                    <ul id="incidents-list" class="menu-list">
                         <!-- <li><a>Dashboard</a></li>
 						<li><a>Customers</a></li> -->
                         <li>
@@ -123,6 +123,13 @@
 							zoom: 13,
 						};
 						const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+						new google.maps.Marker({
+							position: { lat: 49.8736, lng: -119.4939 },
+							map: map,
+							title: 'Hello World!',
+							animation: google.maps.Animation.DROP,
+						});
 
 						document.addEventListener("dispatch_event", (evt) => {
 							const marker = new google.maps.Marker({
