@@ -62,7 +62,7 @@ $(document).ready(function() {
                     </div>
                     <footer class="card-footer" style="text-align: center;">
                         <a href="#" class="card-footer-item" style="border-radius: 10px">Re-assign</a>
-                        <a href="#" class="card-footer-item" style="border-radius: 10px">Cancel</a>
+                        <a href="#" class="card-footer-item" style="border-radius: 10px" onclick="removeMarker(${evtId})">Cancel</a>
                     </footer>
                 </div>
             </li>`
