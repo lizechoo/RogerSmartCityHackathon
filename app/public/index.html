@@ -118,8 +118,6 @@
 
                 <script>
 
-                    var iconOne;
-
                     function myMap() {
 						const mapProp = {
 							center: new google.maps.LatLng(49.882114, -119.477829),
@@ -143,7 +141,7 @@
 							new google.maps.Size(30, 40)
 						);
 
-						IconOne = new google.maps.Marker({
+						new google.maps.Marker({
 							position: { lat: 49.8736, lng: -119.4939 },
 							icon: hospitalIcon,
 							map: map,
@@ -156,8 +154,6 @@
 							map: map,
 							animation: google.maps.Animation.DROP,
                         });
-
-                        IconOne.addListener("click", toggleBounce);
 
 						document.addEventListener("dispatch_event", (evt) => {
 							const marker = new google.maps.Marker({
