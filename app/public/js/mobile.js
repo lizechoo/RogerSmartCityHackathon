@@ -62,7 +62,7 @@ $(document).ready(function() {
                    </div>
                    <footer class="card-footer" style="text-align: center;">
                        <a href="#" class="card-footer-item" style="border-radius: 10px">Accept</a>
-                       <a href="#" class="card-footer-item" style="border-radius: 10px">Decline</a>
+                       <a href="#" class="card-footer-item" style="border-radius: 10px" onclick="removeAlert(${evtId})">Decline</a>
                    </footer>
                </div>
            </li>`

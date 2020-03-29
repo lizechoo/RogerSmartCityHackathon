@@ -79,6 +79,9 @@
             </ul>
 
             <script>
+                function removeAlert(id) {
+                    $(`#${id}`).remove();
+                }
                 // document.addEventListener("dispatch_event", (evt) => {
                 //     const marker = new google.maps.Marker({
                 //         position: { lat: evt.detail.lat, lng: evt.detail.lng },
