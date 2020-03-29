@@ -21,6 +21,7 @@ import time
 #from time import gmtime, strftime
 import pandas as pd 
 import cv2
+import collision
 
 
 
@@ -251,23 +252,29 @@ if __name__ == "__main__":
     plot_tracking=True
     toggle_mode=['car','ped','bike','all']
     toggle_mode_index=4 # it starts with showing all modes
-    fps=10.0
+    fps=30.0
     
     ''' Exisitng file names '''
     file_name='DATA_20200323_154915'
-    file_name='DATA_20200323_160416'
-    file_name='DATA_20200323_161917'
-    file_name='DATA_20200323_163418'
-    file_name='DATA_20200323_164919'
-    file_name='DATA_20200323_170420'
-    file_name='DATA_20200323_171921'
-    file_name='DATA_20200323_173422'
-    file_name='DATA_20200323_174923'
-    file_name='DATA_20200323_180424'
+    # file_name='DATA_20200323_160416'
+    # file_name='DATA_20200323_161917'
+    # file_name='DATA_20200323_163418'
+    # file_name='DATA_20200323_164919'
+    # file_name='DATA_20200323_170420'
+    # file_name='DATA_20200323_171921'
+    # file_name='DATA_20200323_173422'
+    # file_name='DATA_20200323_174923'
+    # file_name='DATA_20200323_180424'
+
+    ''' Collisions Dictionary to store all objects '''
+    road_object = {}
+
+    PEDS_RADIUS = 10      # radius for the pedestrians
+    CYCL_SIZE = 20       # size of the cyclists
+    CAR_SIZE = 15        # size of the cars
     
     
-    
-    pcapSniffer = PcapSniffer('D:/3D_Data_Collection/velodyne32_2mheight/'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer 
+    pcapSniffer = PcapSniffer('./'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer
     
     P_car = pd.read_csv(file_name+'_frozenNotTensorRtBigGood.csv',skiprows=1) # Read CSV file with timestamp, Object ID, x and y cordination and mode, 1 for pedestrian, 2 for cars and 3 for cyclists
     P_ped = pd.read_csv(file_name+'_bigPed_pedestrians.csv') # Read CSV file with timestamp, Object ID, x and y cordination and mode, 1 for pedestrian, 2 for cars and 3 for cyclists
@@ -300,6 +307,7 @@ if __name__ == "__main__":
     P=P.astype(np.int) # Convert everything to integer to make it faster and easier 
     
     while(not exit_flag):
+        road_object = {}
         frame, timeStamp = pcapSniffer.frameOutQueue.get()
         timeStamp=int(timeStamp*10) # The same approach as line code 299
         frame=((frame/frame.max())*255).astype('uint8')
@@ -318,14 +326,26 @@ if __name__ == "__main__":
                 P_sub=P_sub[P_sub[:,4]==toggle_mode_index,:]
             
             
-            ''' Now let's plot the info about all objects in the frame'''
-            
+            ''' Now let's plot the info about all objects in the frame '''
+
 #            unique_obj=np.unique(P_sub[:,1])
             for i in range(len(P_sub)):
                 cx=P_sub[i,2]
                 cy=P_sub[i,3]
                 mode=P_sub[i,4]
                 Oid=P_sub[i,1]
+
+                if(mode == 2):  # Pedestrians
+                    road_object[Oid] = collision.Circle(collision.Vector(cx, cy), PEDS_RADIUS)
+                    cv2.circle(frame, (cx, cy), PEDS_RADIUS, (255, 0, 0), 2)
+
+                if(mode == 1):  # Cars
+                    road_object[Oid] = collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE, CAR_SIZE)
+                    cv2.rectangle(frame, (cx - CAR_SIZE, cy - CAR_SIZE), (cx + CAR_SIZE, cy + CAR_SIZE), (0, 0, 255), 2)
+
+                if(mode == 3):  # Cyclists
+                    road_object[Oid] = collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE, CYCL_SIZE)
+                    cv2.rectangle(frame, (cx - CYCL_SIZE, cy - CYCL_SIZE), (cx + CYCL_SIZE, cy + CYCL_SIZE), (0, 0, 255), 2)
                 
                 if(plot_object):
                     cv2.circle(frame,(cx,cy),3,color[mode-1][0],2)
@@ -357,22 +377,26 @@ if __name__ == "__main__":
                     cv2.polylines(frame,[pts],True,color[int(pt[0,3])-1][0])                        
                     
                     '''Plot Occupancy''' 
-                    if(plot_occupancy):                        
+                    if(plot_occupancy):
                         for i in range(len(P_sub)):
                             cxo=P_sub[i,2]
                             cyo=P_sub[i,3]
                             mode=P_sub[i,4]
                             cx=(max(pt[:,1])-min(pt[:,1]))/2+min(pt[:,1])
                             cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
-                            
+
                             if(point_inside_polygon(cxo,cyo,list(pts))):
                                 if int(pt[0,3])==mode:
                                     cv2.circle(frame,(int(cx),int(cy)),8,(0,0,255),15)
                     cx=(max(pt[:,1])-min(pt[:,1]))/2+min(pt[:,1])
                     cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
                     cv2.putText(frame,str(int(l)),(int(cx),int(cy)),font, 0.6, (255,255,255),2)
-                    
-                    
+
+            for key1 in road_object:
+                for key2 in road_object:
+                    if(key1 != key2):
+                        if(collision.collide(road_object[key1], road_object[key2])):
+                            cv2.putText(frame, 'Warning Collision Detected!', (road_object[key1].pos.x, road_object[key2].pos.y), font, 0.6, (0,0,255),2)
                 
             cv2.putText(frame,'Mode : '+toggle_mode[toggle_mode_index-1],(750,50),font, 0.6, (0,0,255),2)
             cv2.putText(frame,str(frame_count_total),(750,20),font, 0.6, (0,0,255),2)
