@@ -1,10 +1,14 @@
 const express = require("express");
 const app = express();
-const config = require("./config/index");
+const bodyParser = require('body-parser');
+
 
 // const router = express.Router();
 
 const api = require("./routes/api");
+
+app.use(bodyParser.urlencoded({extended : false}));
+app.use(bodyParser.json());
 
 app.use("/api", api);
 app.use(express.static("public"));

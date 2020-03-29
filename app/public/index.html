@@ -123,9 +123,16 @@
 							zoom: 13,
 						};
 						const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-
+ 						const hospitalSvg = {
+							path: "M37 17v10H27V17h-9v30h9V36h10v11h9V17h-9z",
+							fillColor: "none",
+							strokeColor: "#202020" ,
+							strokeWeight: 2,
+							scale: 0.01
+						};
 						new google.maps.Marker({
 							position: { lat: 49.8736, lng: -119.4939 },
+							icon: "http://maps.google.com/mapfiles/kml/shapes/hospitals.png",
 							map: map,
 							title: 'Hello World!',
 							animation: google.maps.Animation.DROP,

@@ -13,8 +13,9 @@ const pusher = new Pusher({
 });
 
 router.post("/dispatch", (req, res) => {
-    console.log("/dispatch endpoint called");
-    
+    console.log("/dispatch endpoint called", req.body, "body end");
+    console.log("req headers", req.headers);
+
     pusher.trigger("my-channel", "my-event", {
         location: "Intersection at Granville St &  W Broadway",
         img: undefined,
