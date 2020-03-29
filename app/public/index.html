@@ -17,7 +17,7 @@
         <nav class="navbar has-background-black-ter" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
                 <a class="navbar-item has-text-white" href="#">
-                    <img src="./img/logo_rectangle.png" alt="Hermes+" style="">
+                    <img src="./img/hermes.png" alt="Hermes+">
                 </a>
 
                 <a
@@ -36,16 +36,16 @@
         <div class="columns has-background-grey-darker" style="margin-top: 0px;">
             <div class="column is-one-quarter" style="height: 950px; overflow-y: scroll">
                 <aside class="menu" style="margin-left: 1rem">
-                    <h1 class="menu-label" style="font-size: 1.15em">
+                    <h1 class="menu-label" style="font-size: 1.15em; font-weight: bold;">
                         Incidents
 					</h1>
                     <ul id="incidents-list" class="menu-list">
                         <!-- <li><a>Dashboard</a></li>
 						<li><a>Customers</a></li> -->
                         <li>
-                            <div class="card" style="margin-bottom: 10px;">
+                            <div class="card" style="margin-bottom: 10px; border-radius: 10px">
                                 <header class="card-header">
-                                    <a class="card-header-title" onclick="toggleBounce('yay')">
+                                    <a class="card-header-title" style="border-radius: 10px">
                                         Intersection at Granville St &  W Broadway
 									</a>
 								</header>
@@ -75,9 +75,9 @@
                                         <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
                                     </div>
                                 </div>
-                                <footer class="card-footer">
-                                    <a href="#" class="card-footer-item">Re-assign</a>
-                                    <a href="#" class="card-footer-item">Cancel</a>
+                                <footer class="card-footer" style="text-align: center">
+                                    <a href="#" class="card-footer-item" style="border-radius: 10px">Re-assign</a>
+                                    <a href="#" class="card-footer-item" style="border-radius: 10px">Cancel</a>
                                 </footer>
 							</div>
                         </li>
@@ -166,14 +166,6 @@
 							animation: google.maps.Animation.DROP,
 							id: "testId",
 						});
-
-						const asdf = new google.maps.Marker({
-							position: { lat: 49.8880, lng: -119.4960 },
-							map: map,
-							animation: google.maps.Animation.DROP,
-						});
-						alertMarkerMapping["yay"] = asdf;
-
 
 						document.addEventListener("dispatch_event", (evt) => {
 							const marker = new google.maps.Marker({

@@ -3,8 +3,6 @@ $(document).ready(function() {
      // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
 
-    let evtCount = 0;
-
     const pusher = new Pusher("2be0eb411175134a82ca", {
         cluster: "us3",
         forceTLS: true
@@ -26,13 +24,13 @@ $(document).ready(function() {
             cancelable: false,
         });
         document.getElementById("googleMap").dispatchEvent(evt);
-        console.log("here");
+
         // Render a card displaying dispatch details
         $("#incidents-list").append(
             `<li id=${evtId}>
-                <div class="card" style="margin-bottom: 10px;">
+                <div class="card" style="margin-bottom: 10px; border-radius: 10px">
                     <header class="card-header">
-                        <a class="card-header-title" onclick="toggleBounce(${evtId})">
+                        <a class="card-header-title" onclick="toggleBounce(${evtId})" style="border-radius: 10px">
                             ${data.location || "Unspecified"}
                         </a>
                     </header>
@@ -62,9 +60,9 @@ $(document).ready(function() {
                             <time datetime="2016-1-1">${data.time}</time>
                         </div>
                     </div>
-                    <footer class="card-footer">
-                        <a href="#" class="card-footer-item">Re-assign</a>
-                        <a href="#" class="card-footer-item">Cancel</a>
+                    <footer class="card-footer" style="text-align: center;">
+                        <a href="#" class="card-footer-item" style="border-radius: 10px">Re-assign</a>
+                        <a href="#" class="card-footer-item" style="border-radius: 10px">Cancel</a>
                     </footer>
                 </div>
             </li>`
