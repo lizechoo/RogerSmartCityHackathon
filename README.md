@@ -1,4 +1,5 @@
 # Hermes+ (UBC - Rogers 5G Smart City Hackathon) - 3rd Place
+Check out a demo here: https://www.youtube.com/watch?v=1v7Cid5zjJQ
 
 ## Inspiration
 The inspiration for this project came from discovering the slow dispatch time for emergency responders around the world. We were also motivated by the potential of 5G and Multi-Access Edge Computing (MEC) and its capabilities of providing reliable low-latency and high bandwidth connections. We thought we could leverage the low-latency to solve a social issue that could ultimately save lives.
