@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Feb 15 14:15:00 2020
-
 @author: asadl
 """
 
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
-
 This is a temporary script file.
 """
 
@@ -19,8 +17,12 @@ import struct
 import time
 #from copy import deepcopy
 #from time import gmtime, strftime
-import pandas as pd 
+import pandas as pd
 import cv2
+import collision
+import itertools
+
+from Send_Alert import *
 
 
 
@@ -255,19 +257,45 @@ if __name__ == "__main__":
     
     ''' Exisitng file names '''
     file_name='DATA_20200323_154915'
-    file_name='DATA_20200323_160416'
-    file_name='DATA_20200323_161917'
-    file_name='DATA_20200323_163418'
-    file_name='DATA_20200323_164919'
-    file_name='DATA_20200323_170420'
-    file_name='DATA_20200323_171921'
-    file_name='DATA_20200323_173422'
-    file_name='DATA_20200323_174923'
-    file_name='DATA_20200323_180424'
+    # file_name='DATA_20200323_160416'
+    # file_name='DATA_20200323_161917'
+    # file_name='DATA_20200323_163418'
+    # file_name='DATA_20200323_164919'
+    # file_name='DATA_20200323_170420'
+    # file_name='DATA_20200323_171921'
+    # file_name='DATA_20200323_173422'
+    # file_name='DATA_20200323_174923'
+    # file_name='DATA_20200323_180424'
+
+    ''' Collisions Dictionary to store all objects '''
+    road_object = {}
+
+    ''' Incident Arrays to store all incidents to prevent from pushing same alerts'''
+    incident_arrays = []
+
+    PEDS_RADIUS = 8      # radius for the pedestrians
+    CYCL_SIZE = 10       # size of the cyclists
+    CAR_SIZE = 20        # size of the cars
+
+    # List of addresses
+    #   1. Latitude
+    #   2. Longtitude
+    #   3. Address
+    address = [[49.886282, -119.476950, "Bernard Ave & Gordon Dr, Kelowna BC"],
+               [49.886325, -119.482776, "Ethel St & Bernard Ave, Kelowna BC"],
+               [49.885388, -119.488528, "Lawrence Ave & Richter St, Kelowna BC"],
+               [49.886321, -119.493538, "Bernard Ave & Ellis St, Kelowna BC"],
+               [49.887323, -119.496564, "Water St & Queensway, Kelowna BC"],
+               [49.893563, -119.488507, "Richter St & Clement Ave, Kelowna BC"],
+               [49.893563, -119.482746, "Clement Ave & Ethel St, Kelowna BC"],
+               [49.893646, -119.477103, "Clement Ave & Gordon Dr, Kelowna BC"],
+               [49.872774, -119.476033, "Guisachan Rd & Gordon Dr, Kelowna BC"],
+               [49.865406, -119.482784, "Raymer Ave & Ethel St, Kelowna BC"]]
+    address_size = len(address)
+    address_index = 0
     
     
-    
-    pcapSniffer = PcapSniffer('D:/3D_Data_Collection/velodyne32_2mheight/'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer 
+    pcapSniffer = PcapSniffer('./'+file_name+'.pcap') # read Pcap file NOTE: Modify path based on your computer
     
     P_car = pd.read_csv(file_name+'_frozenNotTensorRtBigGood.csv',skiprows=1) # Read CSV file with timestamp, Object ID, x and y cordination and mode, 1 for pedestrian, 2 for cars and 3 for cyclists
     P_ped = pd.read_csv(file_name+'_bigPed_pedestrians.csv') # Read CSV file with timestamp, Object ID, x and y cordination and mode, 1 for pedestrian, 2 for cars and 3 for cyclists
@@ -300,6 +328,7 @@ if __name__ == "__main__":
     P=P.astype(np.int) # Convert everything to integer to make it faster and easier 
     
     while(not exit_flag):
+        road_object = {}
         frame, timeStamp = pcapSniffer.frameOutQueue.get()
         timeStamp=int(timeStamp*10) # The same approach as line code 299
         frame=((frame/frame.max())*255).astype('uint8')
@@ -318,14 +347,26 @@ if __name__ == "__main__":
                 P_sub=P_sub[P_sub[:,4]==toggle_mode_index,:]
             
             
-            ''' Now let's plot the info about all objects in the frame'''
-            
+            ''' Now let's plot the info about all objects in the frame '''
+
 #            unique_obj=np.unique(P_sub[:,1])
             for i in range(len(P_sub)):
                 cx=P_sub[i,2]
                 cy=P_sub[i,3]
                 mode=P_sub[i,4]
                 Oid=P_sub[i,1]
+
+                if(mode == 2):  # Pedestrians
+                    road_object[Oid] = [mode, collision.Circle(collision.Vector(cx, cy), PEDS_RADIUS)]
+                    cv2.circle(frame, (cx, cy), PEDS_RADIUS, (255, 0, 0), 2)
+
+                if(mode == 1):  # Cars
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CAR_SIZE * 2, CAR_SIZE * 2)]
+                    cv2.rectangle(frame, (cx - CAR_SIZE, cy - CAR_SIZE), (cx + CAR_SIZE, cy + CAR_SIZE), (0, 0, 255), 2)
+
+                if(mode == 3):  # Cyclists
+                    road_object[Oid] = [mode, collision.Poly.from_box(collision.Vector(cx, cy), CYCL_SIZE * 2, CYCL_SIZE * 2)]
+                    cv2.rectangle(frame, (cx - CYCL_SIZE, cy - CYCL_SIZE), (cx + CYCL_SIZE, cy + CYCL_SIZE), (0, 0, 255), 2)
                 
                 if(plot_object):
                     cv2.circle(frame,(cx,cy),3,color[mode-1][0],2)
@@ -357,22 +398,41 @@ if __name__ == "__main__":
                     cv2.polylines(frame,[pts],True,color[int(pt[0,3])-1][0])                        
                     
                     '''Plot Occupancy''' 
-                    if(plot_occupancy):                        
+                    if(plot_occupancy):
                         for i in range(len(P_sub)):
                             cxo=P_sub[i,2]
                             cyo=P_sub[i,3]
                             mode=P_sub[i,4]
                             cx=(max(pt[:,1])-min(pt[:,1]))/2+min(pt[:,1])
                             cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
-                            
+
                             if(point_inside_polygon(cxo,cyo,list(pts))):
                                 if int(pt[0,3])==mode:
                                     cv2.circle(frame,(int(cx),int(cy)),8,(0,0,255),15)
                     cx=(max(pt[:,1])-min(pt[:,1]))/2+min(pt[:,1])
                     cy=(max(pt[:,2])-min(pt[:,2]))/2+min(pt[:,2])
                     cv2.putText(frame,str(int(l)),(int(cx),int(cy)),font, 0.6, (255,255,255),2)
-                    
-                    
+
+            object_list = road_object.keys()
+            objects_combinations = list(itertools.combinations(object_list, 2))
+
+            for i in objects_combinations:
+                if((not (road_object[i[0]][0] == 2 and road_object[i[1]][0] == 2)) and collision.collide(road_object[i[0]][1] , road_object[i[1]][1])):
+                    # Check if collisions are already reported or not
+                    if(i[0] not in incident_arrays or i[1] not in incident_arrays):
+                        incident_arrays.append(i[0])
+                        incident_arrays.append(i[1])
+                        cv2.putText(frame, 'Warning Collision Detected!', (road_object[i[0]][1].pos.x, road_object[i[0]][1].pos.y), font, 0.6, (0, 0, 255), 2)
+                        print('Collision Detected!')
+                        print(frame_count_total)
+                        # Send alert to Web
+                        send_alert(address[address_index], road_object[i[0]][0], road_object[i[1]][0])
+                        address_index += 1
+                        if(address_index >= address_size):
+                            address_index = 0
+                        break
+
+
                 
             cv2.putText(frame,'Mode : '+toggle_mode[toggle_mode_index-1],(750,50),font, 0.6, (0,0,255),2)
             cv2.putText(frame,str(frame_count_total),(750,20),font, 0.6, (0,0,255),2)
@@ -399,5 +459,3 @@ if __name__ == "__main__":
 
     imageViewer.destroyWindows()
     out.release()  
-
-
